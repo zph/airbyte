@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Optional, MutableMapping, Any, List
 
 import pytest
-from airbyte_protocol import AirbyteCatalog, ConfiguredAirbyteCatalog, ConnectorSpecification, AirbyteMessage
+from airbyte_protocol import AirbyteCatalog, ConfiguredAirbyteCatalog, ConnectorSpecification, AirbyteRecordMessage
 from standard_test.config import Config
 from standard_test.utils import load_config, SecretDict, ConnectorRunner
 
@@ -133,10 +133,10 @@ def pull_docker_image(standard_test_config) -> None:
 
 
 @pytest.fixture(name="expected_records")
-def expected_records_fixture(inputs, base_path) -> List[AirbyteMessage]:
+def expected_records_fixture(inputs, base_path) -> List[AirbyteRecordMessage]:
     path = getattr(inputs, "expected_records_path")
     if not path:
         return []
 
     with open(str(base_path / path)) as f:
-        return [AirbyteMessage.parse_raw(line) for line in f]
+        return [AirbyteRecordMessage.parse_raw(line) for line in f]
