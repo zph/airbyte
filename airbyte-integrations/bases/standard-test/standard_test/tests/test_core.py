@@ -21,11 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+import json
 from collections import Counter
 
 import pytest
-from airbyte_protocol import ConnectorSpecification, Status, Type
+from airbyte_protocol import ConnectorSpecification, Status, Type, AirbyteRecordMessage
 from docker.errors import ContainerError
 from standard_test.base import BaseTest
 from standard_test.config import BasicReadTestConfig, ConnectionTestConfig
@@ -83,7 +83,7 @@ class TestDiscovery(BaseTest):
 
 @pytest.mark.timeout(300)
 class TestBasicRead(BaseTest):
-    def test_read(self, connector_config, configured_catalog, inputs: BasicReadTestConfig, docker_runner: ConnectorRunner):
+    def test_read(self, connector_config, configured_catalog, inputs: BasicReadTestConfig, expected_records: List[AirbyteMessage], docker_runner: ConnectorRunner):
         output = docker_runner.call_read(connector_config, configured_catalog)
         records = [message.record for message in output if message.type == Type.RECORD]
         counter = Counter(record.stream for record in records)
@@ -98,3 +98,13 @@ class TestBasicRead(BaseTest):
             assert (
                 not streams_without_records
             ), f"All streams should return some records, streams without records: {streams_without_records}"
+
+        if expected_records:
+            expected = set(map(self.serialize_record_for_comparison, expected_records))
+            actual = set(map(self.serialize_record_for_comparison, records))
+            missing_records = expected - actual
+            assert not missing_records, f"All records from the expected file should be produced:\n{missing_records}"
+
+    @staticmethod
+    def serialize_record_for_comparison(record: AirbyteRecordMessage):
+        return json.dumps(record.dict(exclude={"emitted_at"}), sort_keys=True)
