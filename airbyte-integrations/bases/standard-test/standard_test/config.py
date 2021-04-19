@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+from pathlib import Path
 from typing import List, Mapping, Optional
 
 from enum import Enum
@@ -63,6 +63,7 @@ class BasicReadTestConfig(BaseConfig):
     config_path: str = config_path
     configured_catalog_path: Optional[str] = configured_catalog_path
     validate_output_from_all_streams: bool = Field(False, description="Verify that all streams have records")
+    expected_records_path: Optional[Path] = Field(description="File with expected records")
 
 
 class FullRefreshConfig(BaseConfig):

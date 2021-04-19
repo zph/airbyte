@@ -23,9 +23,10 @@ SOFTWARE.
 """
 import json
 from collections import Counter
+from typing import List
 
 import pytest
-from airbyte_protocol import ConnectorSpecification, Status, Type, AirbyteRecordMessage
+from airbyte_protocol import ConnectorSpecification, Status, Type, AirbyteRecordMessage, AirbyteMessage
 from docker.errors import ContainerError
 from standard_test.base import BaseTest
 from standard_test.config import BasicReadTestConfig, ConnectionTestConfig
