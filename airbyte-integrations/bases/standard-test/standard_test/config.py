@@ -54,6 +54,19 @@ class ConnectionTestConfig(BaseConfig):
     status: Status = Field(Status.Succeed, description="Indicate if connection check should succeed with provided config")
 
 
+class ExpectedRecordsConfig(BaseModel):
+    class Config:
+        extra = "forbid"
+
+    path: Path = Field(description="File with expected records")
+    exact_order: bool = Field(False, description="Ensure that records produced in exact same order")
+    extra_fields: bool = Field(True, description="Allow records to have other fields")
+    extra_records: bool = Field(
+        True,
+        description="Allow connector to produce extra records, but still enforce all records from the expected file to be produced"
+    )
+
+
 class DiscoveryTestConfig(BaseConfig):
     config_path: str = config_path
     configured_catalog_path: Optional[str] = configured_catalog_path
@@ -63,7 +76,7 @@ class BasicReadTestConfig(BaseConfig):
     config_path: str = config_path
     configured_catalog_path: Optional[str] = configured_catalog_path
     validate_output_from_all_streams: bool = Field(False, description="Verify that all streams have records")
-    expected_records_path: Optional[Path] = Field(description="File with expected records")
+    expected_records: Optional[ExpectedRecordsConfig] = Field(description="Expected records from the read")
 
 
 class FullRefreshConfig(BaseConfig):

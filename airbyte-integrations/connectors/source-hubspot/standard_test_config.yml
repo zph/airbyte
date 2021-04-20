@@ -13,6 +13,8 @@ tests:
     - config_path: "secrets/config.json"
       configured_catalog_path: "sample_files/configured_catalog.json"
       validate_output_from_all_streams: yes
+      expected_records:
+        path: "sample_files/expected_records.txt"
   incremental:
     - config_path: "secrets/config.json"
       configured_catalog_path: "sample_files/configured_catalog.json"
