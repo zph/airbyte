@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+curl --location --request POST 'https://sandbox.plaid.com/item/public_token/exchange' \
+  --header 'Content-Type: application/json;charset=UTF-16' \
+  --data-raw "{
+      \"client_id\": \"$PLAID_CLIENT_ID\",
+      \"secret\": \"$PLAID_SECRET\",
+      \"public_token\": \"$PLAID_PUBLIC_KEY\"
+  }"

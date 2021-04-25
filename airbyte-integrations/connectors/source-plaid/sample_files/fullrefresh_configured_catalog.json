@@ -29,6 +29,234 @@
       },
       "sync_mode": "full_refresh",
       "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "transactions",
+        "supported_sync_modes": ["full_refresh"],
+        "json_schema": {
+                        "$schema": "http://json-schema.org/draft-04/schema#",
+                        "type": "object",
+                        "properties": {
+                          "item": {
+                            "type": "object",
+                            "properties": {
+                              "update_type": {
+                                "type": "string"
+                              },
+                              "webhook": {
+                                "type": "string"
+                              },
+                              "item_id": {
+                                "type": "string"
+                              },
+                              "billed_products": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "consent_expiration_time": {
+                                "type": "null"
+                              },
+                              "error": {
+                                "type": "null"
+                              },
+                              "available_products": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "institution_id": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "total_transactions": {
+                            "type": "integer"
+                          },
+                          "accounts": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "official_name": {
+                                  "type": "string"
+                                },
+                                "balances": {
+                                  "type": "object",
+                                  "properties": {
+                                    "unofficial_currency_code": {
+                                      "type": "null"
+                                    },
+                                    "current": {
+                                      "type": "integer"
+                                    },
+                                    "available": {
+                                      "type": "integer"
+                                    },
+                                    "iso_currency_code": {
+                                      "type": "string"
+                                    },
+                                    "limit": {
+                                      "type": "null"
+                                    }
+                                  }
+                                },
+                                "account_id": {
+                                  "type": "string"
+                                },
+                                "subtype": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "mask": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "transactions": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "date": {
+                                  "type": "string"
+                                },
+                                "transaction_id": {
+                                  "type": "string"
+                                },
+                                "unofficial_currency_code": {
+                                  "type": "null"
+                                },
+                                "transaction_code": {
+                                  "type": "null"
+                                },
+                                "amount": {
+                                  "type": "number"
+                                },
+                                "authorized_datetime": {
+                                  "type": "null"
+                                },
+                                "payment_meta": {
+                                  "type": "object",
+                                  "properties": {
+                                    "payee": {
+                                      "type": "null"
+                                    },
+                                    "ppd_id": {
+                                      "type": "null"
+                                    },
+                                    "reason": {
+                                      "type": "null"
+                                    },
+                                    "by_order_of": {
+                                      "type": "null"
+                                    },
+                                    "payment_processor": {
+                                      "type": "null"
+                                    },
+                                    "payer": {
+                                      "type": "null"
+                                    },
+                                    "reference_number": {
+                                      "type": "null"
+                                    },
+                                    "payment_method": {
+                                      "type": "null"
+                                    }
+                                  }
+                                },
+                                "pending": {
+                                  "type": "boolean"
+                                },
+                                "merchant_name": {
+                                  "type": "string"
+                                },
+                                "transaction_type": {
+                                  "type": "string"
+                                },
+                                "account_owner": {
+                                  "type": "null"
+                                },
+                                "datetime": {
+                                  "type": "null"
+                                },
+                                "account_id": {
+                                  "type": "string"
+                                },
+                                "category_id": {
+                                  "type": "string"
+                                },
+                                "payment_channel": {
+                                  "type": "string"
+                                },
+                                "iso_currency_code": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "location": {
+                                  "type": "object",
+                                  "properties": {
+                                    "country": {
+                                      "type": "string"
+                                    },
+                                    "address": {
+                                      "type": "string"
+                                    },
+                                    "city": {
+                                      "type": "string"
+                                    },
+                                    "store_number": {
+                                      "type": "string"
+                                    },
+                                    "lon": {
+                                      "type": "number"
+                                    },
+                                    "region": {
+                                      "type": "string"
+                                    },
+                                    "postal_code": {
+                                      "type": "string"
+                                    },
+                                    "lat": {
+                                      "type": "number"
+                                    }
+                                  }
+                                },
+                                "pending_transaction_id": {
+                                  "type": "null"
+                                },
+                                "category": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "authorized_date": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "request_id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
     }
   ]
 }

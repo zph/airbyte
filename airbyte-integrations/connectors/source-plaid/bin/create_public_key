@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+curl --location --request POST 'https://sandbox.plaid.com/sandbox/public_token/create' \
+    --header 'Content-Type: application/json;charset=UTF-16' \
+    --data-raw "{
+        \"client_id\": \"$PLAID_CLIENT_ID\",
+        \"secret\": \"$PLAID_SECRET\",
+        \"institution_id\": \"ins_43\",
+        \"initial_products\": [\"auth\", \"transactions\"]
+    }"

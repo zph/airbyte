@@ -5,15 +5,7 @@ const { ArgumentParser } = require('argparse');
 const dateFns = require('date-fns');
 const getMilliseconds = dateFns.getMilliseconds;
 
-async function read(config, catalog) {
-  let balancesStream = null;
-  for (const configuredStreamIndex in catalog.streams) {
-    const configuredStream = catalog.streams[configuredStreamIndex];
-    if (configuredStream.stream.name === 'balances') {
-      balancesStream = configuredStream;
-    }
-  }
-
+async function getBalances(config, catalog, balancesStream){
   if (balancesStream === null) {
     log('No streams selected');
     return;
@@ -38,7 +30,7 @@ async function read(config, catalog) {
   );
 
   if (response.status !== 200) {
-    log('Failure occurred when calling Plaid API');
+    log(`Failure occurred when calling Plaid API ${JSON.stringify(response)}`);
     process.exit(1);
   } else {
     response.data.accounts
@@ -60,6 +52,28 @@ async function read(config, catalog) {
       })
       .forEach((record) => console.log(JSON.stringify(record)));
   }
+}
+async function read(config, catalog, streamName) {
+  let stream = null;
+  for (const configuredStreamIndex in catalog.streams) {
+    const configuredStream = catalog.streams[configuredStreamIndex];
+    log(`Request ${streamName}, current ${configuredStream.stream.name}`)
+    if (configuredStream.stream.name === streamName) {
+      stream = configuredStream;
+    }
+  }
+  if (stream === null) {
+    log(`No valid stream provided: ${streamName}`);
+    process.exit(1);
+  }
+
+  if (streamName === 'balances') {
+    return getBalances(config, catalog, stream);
+  } else {
+    log('No valid stream provided');
+    process.exit(1);
+  }
+
 }
 
 function readJson(filePath) {
@@ -221,6 +235,11 @@ async function run(args) {
     required: true,
     help: 'path to the catalog used to determine which data to read',
   });
+  requiredReadParser.add_argument('--stream', {
+    type: 'str',
+    required: true,
+    help: 'stream to use for fetching data',
+  });
 
   const parsedArgs = mainParser.parse_args(args);
   const command = parsedArgs.command;
@@ -235,7 +254,7 @@ async function run(args) {
   } else if (command === 'read') {
     const config = readJson(getInputFilePath(parsedArgs.config));
     const configuredCatalog = readJson(getInputFilePath(parsedArgs.catalog));
-    await read(config, configuredCatalog);
+    await read(config, configuredCatalog, parsedArgs.stream);
   } else {
     // If we don't recognize the command log the problem and exit with an error code greater than 0 to indicate the process
     // had a failure
