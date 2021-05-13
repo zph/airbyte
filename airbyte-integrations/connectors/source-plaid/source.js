@@ -1,9 +1,55 @@
 const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
+const plaid = require('plaid');
+const moment = require('moment');
 const { ArgumentParser } = require('argparse');
 const dateFns = require('date-fns');
 const getMilliseconds = dateFns.getMilliseconds;
+
+async function getTransactions(config, catalog, stream, state){
+  // We only support full_refresh at the moment, so verify the user didn't ask for another sync mode
+  if (stream.sync_mode !== 'incremental') {
+    log('This connector only supports incremental syncs! (for now)');
+    process.exit(1);
+  }
+
+  const plaidClient = new plaid.Client({
+    clientID: config.client_id,
+    secret: config.api_key,
+    env: plaid.environments.sandbox,
+    options: {
+      version: '2020-09-14',
+    },
+  });
+
+  const now = moment();
+  const today = now.format('YYYY-MM-DD');
+  const thirtyDaysAgo = moment(state.latest_date).format('YYYY-MM-DD');
+
+  await plaidClient.getAllTransactions(config.access_token, thirtyDaysAgo, today)
+    .then(res => transformTransactionsToRecords(res.transactions))
+    //.catch((err) => log(`API Error Code=${err.status_code} type=${err.error_type}`));
+};
+
+// TODO Fix getMilliseconds only returning millis not full timestamp
+// should be equivalent to int(datetime.datetime.now().timestamp()) * 1000
+function transformTransactionsToRecords(transactions) {
+  const now = new Date();
+  transactions
+      .map((txn) => {
+        const data = txn
+        const record = {
+          stream: 'balances',
+          data: data,
+          emitted_at: getMilliseconds(now),
+        };
+        const output = { type: 'RECORD', record: record };
+        log(`Record ${JSON.stringify(output)}`);
+        return output;
+      })
+      .forEach((record) => console.log(JSON.stringify(record)));
+}
 
 async function getBalances(config, catalog, balancesStream){
   if (balancesStream === null) {
@@ -57,7 +103,6 @@ async function read(config, catalog, streamName) {
   let stream = null;
   for (const configuredStreamIndex in catalog.streams) {
     const configuredStream = catalog.streams[configuredStreamIndex];
-    log(`Request ${streamName}, current ${configuredStream.stream.name}`)
     if (configuredStream.stream.name === streamName) {
       stream = configuredStream;
     }
@@ -67,13 +112,18 @@ async function read(config, catalog, streamName) {
     process.exit(1);
   }
 
-  if (streamName === 'balances') {
+  switch(streamName) {
+  case 'balances':
     return getBalances(config, catalog, stream);
-  } else {
+    break;
+  case 'transactions':
+    const state = {latest_date: '2021-04-01'};
+    return getTransactions(config, catalog, stream, state);
+    break;
+  default:
     log('No valid stream provided');
     process.exit(1);
   }
-
 }
 
 function readJson(filePath) {
